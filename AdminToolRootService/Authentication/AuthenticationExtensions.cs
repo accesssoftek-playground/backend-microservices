@@ -6,7 +6,7 @@ namespace AdminToolRootService.Authentication;
 
 internal static class AuthenticationExtensions
 {
-    public static IServiceCollection AddAuthenticationWithJwt(this IServiceCollection services, bool isDevelopment, string publicKeyJwt)
+    public static IServiceCollection AddAuthenticationWithJwt(this IServiceCollection services, bool isDevelopment, KeycloakServiceOptions keycloakOptions)
         {
             services
                 .AddAuthentication(options =>
@@ -24,10 +24,9 @@ internal static class AuthenticationExtensions
                         ValidateAudience = false,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        // TODO: Move to config
-                        ValidIssuer = "http://localhost:6080/realms/AdminToolPrototype",
-                        ValidAudience = "http://localhost:5000",
-                        IssuerSigningKey = BuildRsaKey(publicKeyJwt)
+                        ValidIssuer = keycloakOptions.Issuer,
+                        ValidAudience = keycloakOptions.Audience,
+                        IssuerSigningKey = BuildRsaKey(keycloakOptions.PublicKey)
                     };
                     if (isDevelopment)
                     {
