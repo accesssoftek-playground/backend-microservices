@@ -21,29 +21,31 @@ internal static class AuthenticationExtensions
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidateAudience = false,
+                        ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = keycloakOptions.Issuer,
                         ValidAudience = keycloakOptions.Audience,
                         IssuerSigningKey = BuildRsaKey(keycloakOptions.PublicKey)
                     };
-                    if (isDevelopment)
+                    
+                    if (!isDevelopment) return;
+                    
+                    ILogger GetLogger(HttpContext context) => context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Jwt");
+                        
+                    options.Events = new JwtBearerEvents
                     {
-                        options.Events = new JwtBearerEvents
+                        OnAuthenticationFailed = context =>
                         {
-                            OnAuthenticationFailed = context =>
-                            {
-                                Console.WriteLine("Authentication failed: " + context.Exception.Message);
-                                return Task.CompletedTask;
-                            },
-                            OnTokenValidated = context =>
-                            {
-                                Console.WriteLine("Token validated: " + context.SecurityToken);
-                                return Task.CompletedTask;
-                            }
-                        };
-                    }
+                            GetLogger(context.HttpContext).LogError(context.Exception, "Authentication failed");
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            GetLogger(context.HttpContext).LogDebug("Token validated: {Token}", context.SecurityToken.ToString());
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
             
             return services;
