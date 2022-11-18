@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿// ReSharper disable UnusedMember.Global
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminToolRootService.Controllers;
@@ -14,7 +16,7 @@ public class HeraldController
     [HttpGet(Name = "ping")]
     public Task<ActionResult> Ping()
     {
-        return Task.FromResult<ActionResult>(new OkObjectResult("OK"));
+        return Task.FromResult<ActionResult>(new OkObjectResult(new { Result = "OK" }));
     }
     
     [HttpGet(Name = "version")]
