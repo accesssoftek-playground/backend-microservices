@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using AdminToolRootService.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 

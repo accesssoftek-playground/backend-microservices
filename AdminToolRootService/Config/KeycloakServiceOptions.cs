@@ -1,4 +1,4 @@
-﻿namespace AdminToolRootService;
+﻿namespace AdminToolRootService.Config;
 
 internal sealed class KeycloakServiceOptions
 {

@@ -1,6 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminToolRootService.Controllers;
@@ -11,6 +12,7 @@ namespace AdminToolRootService.Controllers;
 [Route("/api/herald/[action]")]
 [Produces("application/json")]
 [AllowAnonymous]
+[EnableCors(Constants.CorsPolicyName.AllowAll)]
 public class HeraldController
 {
     [HttpGet(Name = "ping")]
