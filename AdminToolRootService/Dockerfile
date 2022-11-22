@@ -6,6 +6,7 @@ EXPOSE 5002
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["AdminToolRootService/AdminToolRootService.csproj", "AdminToolRootService/"]
+RUN dotnet nuget add source https://nexus.orpheusdev.net/repository/nuget-as-common -n Accesssoftek
 RUN dotnet restore "AdminToolRootService/AdminToolRootService.csproj"
 COPY . .
 WORKDIR "/src/AdminToolRootService"

@@ -11,8 +11,7 @@ namespace AdminToolRootService.Controllers.v1;
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 [ApiVersion("1.0")]
-//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-[AllowAnonymous]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class EnvsController : ControllerBase
 {
     private readonly IConfigStorageService _configStorageService;
