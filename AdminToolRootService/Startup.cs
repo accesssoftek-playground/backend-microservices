@@ -1,9 +1,8 @@
-﻿using AdminToolRootService.Authentication;
-using AdminToolRootService.Config;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
+﻿using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi.Models;
+using AdminToolRootService.Authentication;
+using AdminToolRootService.Config;
+using AdminToolRootService.Services;
 
 namespace AdminToolRootService;
 
@@ -23,36 +22,20 @@ internal sealed class Startup
         var keycloakConfigSection = _configuration.GetSection(KeycloakServiceOptions.SectionName);
         services.Configure<KeycloakServiceOptions>(keycloakConfigSection);
         
-        var corsPolicySection = _configuration.GetSection(CorsPolicyOptions.SectionName);
-        services.Configure<CorsPolicyOptions>(corsPolicySection);
+        services.Configure<ConfigStorageOptions>(_configuration.GetSection(ConfigStorageOptions.SectionName));
 
         services.AddAuthenticationWithJwt(_environment.IsDevelopment(), keycloakConfigSection.Get<KeycloakServiceOptions>());
 
+        services.AddCorsPolicy(_configuration, _environment);
+        
         services.AddControllers();
         
         if (_environment.IsDevelopment())
         {
-            services.AddCors(options =>
-            {
-                options.DefaultPolicyName = Constants.CorsPolicyName.AllowAll;
-                AddCorsAllowAll(options);
-            });
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "AdminToolRootService", Version = "v1" });
-            });
-        }
-        else
-        {
-            services.AddCors(options =>
-            {
-                options.DefaultPolicyName = Constants.CorsPolicyName.Production;
-                AddCorsAllowAll(options);
-                options.AddPolicy(Constants.CorsPolicyName.Production, builder => builder
-                    .WithOrigins(corsPolicySection.Get<CorsPolicyOptions>().Origins.ToArray())
-                    .WithHeaders(corsPolicySection.Get<CorsPolicyOptions>().Headers.ToArray())
-                    .WithMethods(corsPolicySection.Get<CorsPolicyOptions>().Methods.ToArray()));
+                c.SwaggerDoc(Constants.OpenApi.Version, new OpenApiInfo { Title = Constants.OpenApi.Title, Version = Constants.OpenApi.Version });
             });
         }
         
@@ -60,7 +43,7 @@ internal sealed class Startup
         {
             options.ReportApiVersions = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
-            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.DefaultApiVersion = Constants.OpenApi.DefaultApiVersion;
             options.ApiVersionReader = new UrlSegmentApiVersionReader();
         });
         
@@ -68,13 +51,9 @@ internal sealed class Startup
         {
             setup.GroupNameFormat = "'v'VVV";
             setup.SubstituteApiVersionInUrl = true;
-        });        
-    }
+        });
 
-    private static void AddCorsAllowAll(CorsOptions options)
-    {
-        options.AddPolicy(Constants.CorsPolicyName.AllowAll,
-            builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        services.AddScoped<IConfigStorageService, ConfigStorageService>();
     }
 
     public void Configure(IApplicationBuilder app)
