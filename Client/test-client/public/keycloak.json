@@ -1,0 +1,8 @@
+﻿{
+  "realm": "AdminToolPrototype",
+  "auth-server-url": "https://52.206.182.160:8443/",
+  "ssl-required": "none",
+  "resource": "admintool-prototype-web",
+  "public-client": true,
+  "confidential-port": 0
+}
