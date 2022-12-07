@@ -17,6 +17,9 @@ RUN dotnet publish "AdminToolRootService.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENV ASPNETCORE_URLS=http://+:5002
+COPY ./AdminToolRootService/https-dev-cert.bin /app/https-dev-cert.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/https-dev-cert.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=dev-cert-password
+ENV ASPNETCORE_URLS=http://+:5002;https://+:5001
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENTRYPOINT ["dotnet", "AdminToolRootService.dll"]
