@@ -86,7 +86,6 @@ internal sealed class Startup
             app.UseDeveloperExceptionPage();
         }
 
-        app.UseHttpsRedirection();
         app.UseRouting();
         app.UseCors();
         app.UseAuthorization();
